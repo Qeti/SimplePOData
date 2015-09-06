@@ -1,0 +1,32 @@
+{
+    "name": "iriscrm/SimplePOData",
+    "description": "Library for simple use OData with POData library",
+    "keywords": ["odata", "podata", "rest"],
+    "homepage": "https://github.com/iriscrm/SimplePOData#readme",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nikolay Matushenkov",
+            "email": "mnvx@yandex.ru",
+            "role": "Creator"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/iriscrm/SimplePOData/issues",
+        "source": "https://github.com/iriscrm/SimplePOData"
+    },
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "iriscrm\\SimplePOData\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.9.x-dev"
+        }
+    }
+}
