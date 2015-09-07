@@ -101,7 +101,7 @@ abstract class BaseQueryProvider implements IQueryProvider
         $sqlCount = 'SELECT COUNT(*) FROM ' . $tableName . $where;
         if ($queryType == QueryType::ENTITIES() || $queryType == QueryType::ENTITIES_WITH_COUNT()) {
             $sql = 'SELECT ' . $option . ' * FROM ' . $tableName . $where . $order
-                    . ' LIMIT ' . $top . ' OFFSET ' . $skip;
+                    . ' LIMIT ' . $top . ($skip ? ' OFFSET ' . $skip : '');
             $data = $this->queryAll($sql);
             
             if ($queryType == QueryType::ENTITIES_WITH_COUNT()){

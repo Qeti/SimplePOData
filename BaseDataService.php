@@ -25,6 +25,8 @@ class BaseDataService extends BaseService implements IService
      * @var IQueryProvider
      */
     protected $queryProvider;
+
+    public $maxPageSize = 200;
   
     public function __construct($db, SimpleMetadataProvider $metaProvider){
         $this->metaProvider = $metaProvider;
@@ -33,6 +35,7 @@ class BaseDataService extends BaseService implements IService
 
     public function initialize(ServiceConfiguration $config)
     {
+        $config->setEntitySetPageSize('*', $this->maxPageSize);
         $config->setEntitySetAccessRule('*', EntitySetRights::ALL);
         $config->setAcceptCountRequests(true);
         $config->setAcceptProjectionRequests(true);
