@@ -61,6 +61,19 @@ abstract class BaseQueryProvider implements IQueryProvider
         return strtolower($tableName);
     }
 
+    protected function getOrderByExpressionAsString($orderBy)
+    {
+        $result = '';
+        foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
+            foreach ($order->getSubPathSegments() as $subOrder) {
+                $result .= $result ? ', ' : '';
+                $result .= $subOrder->getName();
+                $result .= $order->isAscending() ? ' ASC' : ' DESC';
+            }
+        }
+        return $result;
+    }
+
     public function getResourceSet(
         QueryType $queryType,
         ResourceSet $resourceSet,
@@ -81,10 +94,13 @@ abstract class BaseQueryProvider implements IQueryProvider
             //$option = 'SQL_CALC_FOUND_ROWS';
         }
 
-        $where = $filterInfo ? ' WHERE ' . $filterInfo->getExpressionAsString(): '';
+        $where = $filterInfo ? ' WHERE ' . $filterInfo->getExpressionAsString() : '';
+
+        $order = $orderBy ? ' ORDER BY ' . $this->getOrderByExpressionAsString($orderBy) : '';
+
         $sqlCount = 'SELECT COUNT(*) FROM ' . $tableName . $where;
         if ($queryType == QueryType::ENTITIES() || $queryType == QueryType::ENTITIES_WITH_COUNT()) {
-            $sql = 'SELECT ' . $option . ' * FROM ' . $tableName . $where 
+            $sql = 'SELECT ' . $option . ' * FROM ' . $tableName . $where . $order
                     . ' LIMIT ' . $top . ' OFFSET ' . $skip;
             $data = $this->queryAll($sql);
             
