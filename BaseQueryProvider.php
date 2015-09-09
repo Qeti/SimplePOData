@@ -5,6 +5,7 @@ namespace iriscrm\SimplePOData;
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\QueryProcessor\Expression\Parser\IExpressionProvider;
+use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use POData\Providers\Query\IQueryProvider;
 use POData\Providers\Expression\MySQLExpressionProvider;
@@ -101,7 +102,7 @@ abstract class BaseQueryProvider implements IQueryProvider
         $sqlCount = 'SELECT COUNT(*) FROM ' . $tableName . $where;
         if ($queryType == QueryType::ENTITIES() || $queryType == QueryType::ENTITIES_WITH_COUNT()) {
             $sql = 'SELECT ' . $option . ' * FROM ' . $tableName . $where . $order
-                    . ' LIMIT ' . $top . ($skip ? ' OFFSET ' . $skip : '');
+                    . ($top ? ' LIMIT ' . $top : '') . ($skip ? ' OFFSET ' . $skip : '');
             $data = $this->queryAll($sql);
             
             if ($queryType == QueryType::ENTITIES_WITH_COUNT()){
@@ -151,30 +152,44 @@ abstract class BaseQueryProvider implements IQueryProvider
     public function getRelatedResourceSet(
         QueryType $queryType,
         ResourceSet $sourceResourceSet,
-        stdClass $sourceEntityInstance,
+        $sourceEntityInstance,
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty,
-        $filter = null,
+        $filterInfo = null,
         $orderBy = null,
         $top = null,
         $skip = null
     ) {
-        return null;
+        # Correct filter
+        $srcClass = get_class($sourceEntityInstance);
+        $filterFieldName = $this->getTableName($this->getEntityName($srcClass)) . '_id';
+        $navigationPropertiesUsedInTheFilterClause = null;
+        $filterExpAsDataSourceExp = '';
+        if ($filterInfo) {
+            $navigationPropertiesUsedInTheFilterClause = $filterInfo->getNavigationPropertiesUsed();
+            $filterExpAsDataSourceExp = $filterInfo->getExpressionAsString();
+        }
+        $filterExpAsDataSourceExp .= $filterExpAsDataSourceExp ? ' AND ' : '';
+        $filterExpAsDataSourceExp .= $filterFieldName . ' = ' . $sourceEntityInstance->id;
+        $completeFilterInfo = new FilterInfo($navigationPropertiesUsedInTheFilterClause, $filterExpAsDataSourceExp);
+
+        return $this->getResourceSet($queryType, $targetResourceSet, $completeFilterInfo, $orderBy, $top, $skip);
     }
 
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
-        stdClass $sourceEntityInstance,
+        $sourceEntityInstance,
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty,
         KeyDescriptor $keyDescriptor
     ) {
+        //return $this->getResourceFromResourceSet($targetResourceSet, $keyDescriptor);
         return null;
     }
 
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
-        stdClass $sourceEntityInstance,
+        $sourceEntityInstance,
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty
     ) {
