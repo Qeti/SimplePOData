@@ -125,28 +125,7 @@ abstract class BaseQueryProvider implements IQueryProvider
         ResourceSet $resourceSet,
         KeyDescriptor $keyDescriptor
     ) {
-        $where = '';
-        $parameters = [];
-        $index = 0;
-        foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
-            $index++;
-            //Keys have already been validated, so this is not a SQL injection surface 
-            $where .= $where ? ' AND ' : '';
-            $where .= $key . ' = :param' . $index;
-            $parameters[':param' . $index] = $value[0];
-        }
-        $where = $where ? ' WHERE ' . $where : '';
-
-        $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
-        $entityName = $this->getEntityName($entityClassName);
-
-        $sql = 'SELECT * FROM ' . $this->getTableName($entityName) . $where . ' LIMIT 1';
-        $result = $this->queryAll($sql, $parameters);
-        if ($result) {
-            $result = $result[0];
-        }
-
-        return $entityClassName::fromRecord($result);
+        return $this->getResource($resourceSet, $keyDescriptor);
     }
 
     public function getRelatedResourceSet(
@@ -183,8 +162,49 @@ abstract class BaseQueryProvider implements IQueryProvider
         ResourceProperty $targetProperty,
         KeyDescriptor $keyDescriptor
     ) {
-        //return $this->getResourceFromResourceSet($targetResourceSet, $keyDescriptor);
-        return null;
+        $entityClassName = $sourceResourceSet->getResourceType()->getInstanceType()->name;
+        $entityName = $this->getEntityName($entityClassName);
+        $fieldName = $this->getTableName($entityName) . '_id';
+
+        return $this->getResource($targetResourceSet, $keyDescriptor, [
+            $fieldName => $sourceEntityInstance->id
+        ]);
+    }
+
+    protected function getResource(
+        ResourceSet $resourceSet,
+        KeyDescriptor $keyDescriptor,
+        array $whereCondition = []
+    ) {
+        $where = '';
+        $parameters = [];
+        $index = 0;
+        foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
+            $index++;
+            //Keys have already been validated, so this is not a SQL injection surface 
+            $where .= $where ? ' AND ' : '';
+            $where .= $key . ' = :param' . $index;
+            $parameters[':param' . $index] = $value[0];
+        }
+        $where = $where ? ' WHERE ' . $where : '';
+
+        foreach ($whereCondition as $fieldName => $fieldValue) {
+            $index++;
+            $where .= $where ? ' AND ' : '';
+            $where .= $fieldName . ' = :param' . $index;
+            $parameters[':param' . $index] = $fieldValue;
+        }
+
+        $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
+        $entityName = $this->getEntityName($entityClassName);
+
+        $sql = 'SELECT * FROM ' . $this->getTableName($entityName) . $where . ' LIMIT 1';
+        $result = $this->queryAll($sql, $parameters);
+        if ($result) {
+            $result = $result[0];
+        }
+
+        return $entityClassName::fromRecord($result);
     }
 
     public function getRelatedResourceReference(
