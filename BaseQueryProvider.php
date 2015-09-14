@@ -139,7 +139,7 @@ abstract class BaseQueryProvider implements IQueryProvider
         $top = null,
         $skip = null
     ) {
-        # Correct filter
+        // Correct filter
         $srcClass = get_class($sourceEntityInstance);
         $filterFieldName = $this->getTableName($this->getEntityName($srcClass)) . '_id';
         $navigationPropertiesUsedInTheFilterClause = null;
@@ -173,20 +173,21 @@ abstract class BaseQueryProvider implements IQueryProvider
 
     protected function getResource(
         ResourceSet $resourceSet,
-        KeyDescriptor $keyDescriptor,
+        $keyDescriptor,
         array $whereCondition = []
     ) {
         $where = '';
         $parameters = [];
         $index = 0;
-        foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
-            $index++;
-            //Keys have already been validated, so this is not a SQL injection surface 
-            $where .= $where ? ' AND ' : '';
-            $where .= $key . ' = :param' . $index;
-            $parameters[':param' . $index] = $value[0];
+        if ($keyDescriptor) {
+            foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
+                $index++;
+                //Keys have already been validated, so this is not a SQL injection surface 
+                $where .= $where ? ' AND ' : '';
+                $where .= $key . ' = :param' . $index;
+                $parameters[':param' . $index] = $value[0];
+            }
         }
-        $where = $where ? ' WHERE ' . $where : '';
 
         foreach ($whereCondition as $fieldName => $fieldValue) {
             $index++;
@@ -194,6 +195,8 @@ abstract class BaseQueryProvider implements IQueryProvider
             $where .= $fieldName . ' = :param' . $index;
             $parameters[':param' . $index] = $fieldValue;
         }
+
+        $where = $where ? ' WHERE ' . $where : '';
 
         $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
         $entityName = $this->getEntityName($entityClassName);
@@ -213,7 +216,13 @@ abstract class BaseQueryProvider implements IQueryProvider
         ResourceSet $targetResourceSet,
         ResourceProperty $targetProperty
     ) {
-        return null;
+        $entityClassName = $targetResourceSet->getResourceType()->getInstanceType()->name;
+        $entityName = $this->getEntityName($entityClassName);
+        $fieldName = $this->getTableName($entityName) . '_id';
+
+        return $this->getResource($targetResourceSet, null, [
+            'id' => $sourceEntityInstance->$fieldName
+        ]);
     }
 
 }
