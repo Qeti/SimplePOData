@@ -6,6 +6,7 @@ use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;
 use POData\UriProcessor\QueryProcessor\Expression\Parser\IExpressionProvider;
 use POData\UriProcessor\QueryProcessor\ExpressionParser\FilterInfo;
+use POData\UriProcessor\QueryProcessor\OrderByParser\InternalOrderByInfo;
 use POData\UriProcessor\ResourcePathProcessor\SegmentParser\KeyDescriptor;
 use POData\Providers\Query\IQueryProvider;
 use POData\Providers\Expression\MySQLExpressionProvider;
@@ -23,8 +24,24 @@ abstract class BaseQueryProvider implements IQueryProvider
         $this->db = $db;
     }
 
+    /**
+     * Query all data from DB
+     *
+     * @param string $sql SQL query
+     * @param array|null $parameters Parameters for SQL query
+     *
+     * @return array[]|null Array of associated arrays (column name => column value)
+     */
     abstract protected function queryAll($sql, $parameters = null);
 
+    /**
+     * Query one value from DB
+     *
+     * @param string $sql SQL query
+     * @param array|null $parameters Parameters for SQL query
+     *
+     * @return mixed Value
+     */
     abstract protected function queryScalar($sql, $parameters = null);
 
     /* Stubbed Implementaiton Here */
@@ -43,6 +60,13 @@ abstract class BaseQueryProvider implements IQueryProvider
         return new MySQLExpressionProvider();
     }
 
+    /**
+     * Get entity name by class name
+     *
+     * @param string $entityClassName Class name
+     *
+     * @return string Entity name
+     */
     protected function getEntityName($entityClassName)
     {
         preg_match_all('/\\\([a-zA-Z]+)/', $entityClassName, $matches);
@@ -52,6 +76,13 @@ abstract class BaseQueryProvider implements IQueryProvider
         return $entityClassName;
     }
 
+    /**
+     * Get table name by entity name
+     *
+     * @param string $entityName Entity name
+     *
+     * @return string Table name
+     */
     protected function getTableName($entityName)
     {
         $tableName = $entityName;
@@ -62,7 +93,14 @@ abstract class BaseQueryProvider implements IQueryProvider
         return strtolower($tableName);
     }
 
-    protected function getOrderByExpressionAsString($orderBy)
+    /**
+     * Get part of SQL query with ORDER BY condition
+     *
+     * @param InternalOrderByInfo $orderBy Order by condition
+     *
+     * @return string ORDER BY condition
+     */
+    protected function getOrderByExpressionAsString(InternalOrderByInfo $orderBy)
     {
         $result = '';
         foreach ($orderBy->getOrderByInfo()->getOrderByPathSegments() as $order) {
@@ -75,6 +113,51 @@ abstract class BaseQueryProvider implements IQueryProvider
         return $result;
     }
 
+    /**
+     * Common method for getResourceFromRelatedResourceSet() and getResourceFromResourceSet()
+     */
+    protected function getResource(
+        ResourceSet $resourceSet,
+        $keyDescriptor,
+        array $whereCondition = []
+    ) {
+        $where = '';
+        $parameters = [];
+        $index = 0;
+        if ($keyDescriptor) {
+            foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
+                $index++;
+                //Keys have already been validated, so this is not a SQL injection surface 
+                $where .= $where ? ' AND ' : '';
+                $where .= $key . ' = :param' . $index;
+                $parameters[':param' . $index] = $value[0];
+            }
+        }
+
+        foreach ($whereCondition as $fieldName => $fieldValue) {
+            $index++;
+            $where .= $where ? ' AND ' : '';
+            $where .= $fieldName . ' = :param' . $index;
+            $parameters[':param' . $index] = $fieldValue;
+        }
+
+        $where = $where ? ' WHERE ' . $where : '';
+
+        $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
+        $entityName = $this->getEntityName($entityClassName);
+
+        $sql = 'SELECT * FROM ' . $this->getTableName($entityName) . $where . ' LIMIT 1';
+        $result = $this->queryAll($sql, $parameters);
+        if ($result) {
+            $result = $result[0];
+        }
+
+        return $entityClassName::fromRecord($result);
+    }
+
+    /**
+     * For queries like http://localhost/NorthWind.svc/Customers
+     */
     public function getResourceSet(
         QueryType $queryType,
         ResourceSet $resourceSet,
@@ -121,6 +204,9 @@ abstract class BaseQueryProvider implements IQueryProvider
         return $result;
     }
 
+    /**
+     * For queries like http://localhost/NorthWind.svc/Customers(‘ALFKI’)
+     */
     public function getResourceFromResourceSet(
         ResourceSet $resourceSet,
         KeyDescriptor $keyDescriptor
@@ -128,6 +214,9 @@ abstract class BaseQueryProvider implements IQueryProvider
         return $this->getResource($resourceSet, $keyDescriptor);
     }
 
+    /**
+     * For queries like http://localhost/NorthWind.svc/Customers(‘ALFKI’)/Orders
+     */
     public function getRelatedResourceSet(
         QueryType $queryType,
         ResourceSet $sourceResourceSet,
@@ -155,6 +244,9 @@ abstract class BaseQueryProvider implements IQueryProvider
         return $this->getResourceSet($queryType, $targetResourceSet, $completeFilterInfo, $orderBy, $top, $skip);
     }
 
+    /**
+     * For queries like http://localhost/NorthWind.svc/Customers(‘ALFKI’)/Orders(10643)
+     */
     public function getResourceFromRelatedResourceSet(
         ResourceSet $sourceResourceSet,
         $sourceEntityInstance,
@@ -171,45 +263,9 @@ abstract class BaseQueryProvider implements IQueryProvider
         ]);
     }
 
-    protected function getResource(
-        ResourceSet $resourceSet,
-        $keyDescriptor,
-        array $whereCondition = []
-    ) {
-        $where = '';
-        $parameters = [];
-        $index = 0;
-        if ($keyDescriptor) {
-            foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
-                $index++;
-                //Keys have already been validated, so this is not a SQL injection surface 
-                $where .= $where ? ' AND ' : '';
-                $where .= $key . ' = :param' . $index;
-                $parameters[':param' . $index] = $value[0];
-            }
-        }
-
-        foreach ($whereCondition as $fieldName => $fieldValue) {
-            $index++;
-            $where .= $where ? ' AND ' : '';
-            $where .= $fieldName . ' = :param' . $index;
-            $parameters[':param' . $index] = $fieldValue;
-        }
-
-        $where = $where ? ' WHERE ' . $where : '';
-
-        $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
-        $entityName = $this->getEntityName($entityClassName);
-
-        $sql = 'SELECT * FROM ' . $this->getTableName($entityName) . $where . ' LIMIT 1';
-        $result = $this->queryAll($sql, $parameters);
-        if ($result) {
-            $result = $result[0];
-        }
-
-        return $entityClassName::fromRecord($result);
-    }
-
+    /**
+     * For queries like http://localhost/NorthWind.svc/Orders(10643)/Customer 
+     */
     public function getRelatedResourceReference(
         ResourceSet $sourceResourceSet,
         $sourceEntityInstance,
