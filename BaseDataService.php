@@ -30,7 +30,13 @@ class BaseDataService extends BaseService implements IService
   
     public function __construct($db, SimpleMetadataProvider $metaProvider){
         $this->metaProvider = $metaProvider;
-        $this->queryProvider = new QueryProvider($db);
+        if (!empty($db->queryProviderClassName)) {
+            $queryProviderClassName = $db->queryProviderClassName;
+            $this->queryProvider = new $queryProviderClassName($db);
+        }
+        else {
+            $this->queryProvider = new QueryProvider($db);
+        }
     }
 
     public function initialize(ServiceConfiguration $config)
