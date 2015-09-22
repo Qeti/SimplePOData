@@ -17,7 +17,8 @@
         "source": "https://github.com/iriscrm/SimplePOData"
     },
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "POData/POData": "dev-develop"
     },
     "autoload": {
         "psr-4": {
@@ -28,5 +29,11 @@
         "branch-alias": {
             "dev-master": "0.9.x-dev"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/iriscrm/POData"
+        }
+    ]
 }
