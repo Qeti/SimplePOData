@@ -20,16 +20,16 @@ Installation is recommended to be done via [composer][]. Add the following to th
 
 ```json
     "require": {
-       "iriscrm/SimplePOData": ">=0.9.1"
+       "mnvx/SimplePOData": ">=0.9.1"
     },
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/iriscrm/POData"
+            "url": "https://github.com/mnvx/POData"
         },
         {
             "type": "vcs",
-            "url": "https://github.com/iriscrm/SimplePOData"
+            "url": "https://github.com/mnvx/SimplePOData"
         }
     ]
 ```
@@ -63,7 +63,7 @@ with it as long as you mention my name and include the [license file][license]. 
 
 [MIT License]: http://opensource.org/licenses/MIT
 
-[license]: https://github.com/iriscrm/SimplePOData/blob/master/LICENSE
+[license]: https://github.com/mnvx/SimplePOData/blob/master/LICENSE
 
 Contact
 -------
