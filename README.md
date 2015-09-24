@@ -20,13 +20,12 @@ Installation is recommended to be done via [composer][]. Add the following to th
 
 ```json
     "require": {
-       "POData/POData": "dev-master",
-       "iriscrm/SimplePOData": "dev-master"
+       "iriscrm/SimplePOData": ">=0.9.1"
     },
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/POData/POData"
+            "url": "https://github.com/iriscrm/POData"
         },
         {
             "type": "vcs",

@@ -30,6 +30,5 @@
             "type": "vcs",
             "url": "https://github.com/iriscrm/POData"
         }
-    ],
-    "minimum-stability": "dev"
+    ]
 }
