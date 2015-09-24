@@ -18,16 +18,11 @@
     },
     "require": {
         "php": ">=5.4.0",
-        "POData/POData": "dev-develop"
+        "POData/POData": ">=0.9"
     },
     "autoload": {
         "psr-4": {
             "iriscrm\\SimplePOData\\": ""
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "0.9.x-dev"
         }
     },
     "repositories": [
