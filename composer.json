@@ -1,8 +1,8 @@
 {
-    "name": "mnvx/SimplePOData",
+    "name": "qeti/SimplePOData",
     "description": "Library for simple use OData with POData library",
     "keywords": ["odata", "podata", "rest"],
-    "homepage": "https://github.com/mnvx/SimplePOData#readme",
+    "homepage": "https://github.com/qeti/SimplePOData#readme",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -13,8 +13,8 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/mnvx/SimplePOData/issues",
-        "source": "https://github.com/mnvx/SimplePOData"
+        "issues": "https://github.com/qeti/SimplePOData/issues",
+        "source": "https://github.com/qeti/SimplePOData"
     },
     "require": {
         "php": ">=5.4.0",
@@ -22,13 +22,13 @@
     },
     "autoload": {
         "psr-4": {
-            "mnvx\\SimplePOData\\": ""
+            "qeti\\SimplePOData\\": ""
         }
     },
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/mnvx/POData"
+            "url": "https://github.com/qeti/POData"
         }
     ]
 }
