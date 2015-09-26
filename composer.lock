@@ -1,0 +1,104 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "114c97333be46a6787a65e37b3b1e47c",
+    "packages": [
+        {
+            "name": "myclabs/php-enum",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/myclabs/php-enum.git",
+                "reference": "ab9e3122fb4f24bff81db37652b88cefe2b4b89c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/myclabs/php-enum/zipball/ab9e3122fb4f24bff81db37652b88cefe2b4b89c",
+                "reference": "ab9e3122fb4f24bff81db37652b88cefe2b4b89c",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "MyCLabs": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP Enum implementation",
+            "homepage": "http://github.com/myclabs/php-enum",
+            "keywords": [
+                "enum"
+            ],
+            "time": "2013-07-24 12:08:12"
+        },
+        {
+            "name": "qeti/podata",
+            "version": "v0.9.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Qeti/POData.git",
+                "reference": "6f572059fff3dd6287876f59831989b82bebc0c4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Qeti/POData/zipball/6f572059fff3dd6287876f59831989b82bebc0c4",
+                "reference": "6f572059fff3dd6287876f59831989b82bebc0c4",
+                "shasum": ""
+            },
+            "require": {
+                "myclabs/php-enum": "1.2.0",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "balihoo/phockito-unit": "1.0.0",
+                "doctrine/annotations": "1.*",
+                "hafriedlander/phockito": "dev-master",
+                "phpunit/phpunit": "3.7.*",
+                "satooshi/php-coveralls": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "POData": "src/",
+                    "UnitTests": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Microsoft Open Technologies, Inc.",
+                    "email": "msopentech@microsoft.com"
+                },
+                {
+                    "name": "POData Project",
+                    "email": "podataproject@gmail.com"
+                }
+            ],
+            "description": "OData for Poor PHP Developers",
+            "keywords": [
+                "odata",
+                "rest"
+            ],
+            "time": "2015-09-25 20:42:57"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=5.4.0"
+    },
+    "platform-dev": []
+}

@@ -1,5 +1,5 @@
 {
-    "name": "qeti/SimplePOData",
+    "name": "qeti/simple-podata",
     "description": "Library for simple use OData with POData library",
     "keywords": ["odata", "podata", "rest"],
     "homepage": "https://github.com/qeti/SimplePOData#readme",
@@ -18,17 +18,11 @@
     },
     "require": {
         "php": ">=5.4.0",
-        "qeti/POData": ">=0.9"
+        "qeti/podata": ">=0.9"
     },
     "autoload": {
         "psr-4": {
             "qeti\\SimplePOData\\": ""
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/qeti/POData"
-        }
-    ]
+    }
 }
