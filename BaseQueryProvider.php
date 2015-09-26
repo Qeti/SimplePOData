@@ -1,6 +1,6 @@
 <?php
 
-namespace iriscrm\SimplePOData;
+namespace qeti\SimplePOData;
 
 use POData\Providers\Metadata\ResourceProperty;
 use POData\Providers\Metadata\ResourceSet;

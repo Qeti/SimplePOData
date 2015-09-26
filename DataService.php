@@ -1,6 +1,6 @@
 <?php
 
-namespace iriscrm\SimplePOData;
+namespace qeti\SimplePOData;
 
 /**
  * DataService that implements IServiceProvider.

@@ -1,8 +1,6 @@
 <?php
 
-namespace iriscrm\SimplePOData;
-
-//use stdClass;
+namespace qeti\SimplePOData;
 
 trait EntityTrait {
 
