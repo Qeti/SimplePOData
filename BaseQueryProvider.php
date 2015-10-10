@@ -44,6 +44,16 @@ abstract class BaseQueryProvider implements IQueryProvider
      */
     abstract protected function queryScalar($sql, $parameters = null);
 
+    /**
+     * Execute INSERT/UPDATE/DELETE query
+     *
+     * @param string $sql SQL query
+     * @param array|null $parameters Parameters for SQL query
+     *
+     * @return mixed Value
+     */
+    abstract protected function execute($sql, $parameters = null);
+
     /* Stubbed Implementaiton Here */
     public function getQueryProvider()
     {
@@ -279,6 +289,43 @@ abstract class BaseQueryProvider implements IQueryProvider
         return $this->getResource($targetResourceSet, null, [
             'id' => $sourceEntityInstance->$fieldName
         ]);
+    }
+
+    /**
+     * For PUT queries like http://localhost/NorthWind.svc/Orders(10643). Update operation.
+     */
+    public function putResource(
+        ResourceSet $resourceSet,
+        KeyDescriptor $keyDescriptor,
+        $data
+    ) {
+        $entityClassName = $resourceSet->getResourceType()->getInstanceType()->name;
+        $entityName = $this->getEntityName($entityClassName);
+        $tableName = $this->getTableName($entityName);
+
+        $where = '';
+        $parameters = [];
+        $index = 0;
+        foreach ($keyDescriptor->getValidatedNamedValues() as $key => $value) {
+            $index++;
+            //Keys have already been validated, so this is not a SQL injection surface 
+            $where .= $where ? ' AND ' : '';
+            $where .= $key . ' = :param' . $index;
+            $parameters[':param' . $index] = $value[0];
+        }
+        $where = ' WHERE ' . $where;
+
+        $fields = '';
+        $index = 0;
+        foreach ($data as $key => $value) {
+            $index++;
+            $fields .= $fields ? ', ' : '';
+            $fields .= $key . ' = :value' . $index;
+            $parameters[':value' . $index] = $value;
+        }
+ 
+        $sql = 'UPDATE ' . $tableName . ' SET ' . $fields . $where;
+        return $this->execute($sql, $parameters);
     }
 
 }
